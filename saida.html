@@ -1,82 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Conversor de Moeda - Saída</title>
-  </head>
-  <body>
-    <label>Moeda de Destino</label>
-    <input type="text" id="1" disabled />
-    <br />
-    <label>Valor de Destino</label>
-    <input type="number" id="2" disabled />
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Conversor de Moeda - Saída</title>
 
-    <br />
-    <button type="button" onclick="voltar()">Voltar</button>
-
-    <script>
-      function voltar() {
-        //voltar para tela de entrada
-        location.href = "entrada.html";
-      }
-
-      function valorOrigem() {
-        let oUrl = new URL(location.href);
-        let sValorOrigem = oUrl.searchParams.get("valor_origem");
-        console.log(sValorOrigem);
-        return sValorOrigem;
-      }
-
-      function moedaOrigem() {
-        let oUrl = new URL(location.href);
-        let sMoedaOrigem = oUrl.searchParams.get("moeda_origem");
-
-        console.log(sMoedaOrigem);
-        return sMoedaOrigem;
-      }
-
-      function moedaDestino() {
-        let oUrl = new URL(location.href);
-        let sMoedaDestino = oUrl.searchParams.get("moeda_destino");
-        document.getElementById("1").value = sMoedaDestino.toUpperCase();        
-        return sMoedaDestino.toUpperCase();
-      }
-
-      function valorDestion(sReais){
-        document.getElementById("2").value = sReais;
-      }
-
-      function callBack() {
-        //o Resultado vem no "this"
-        console.log("caiu aqui antes do send");
-        let oResponse = this;
-        let sResponseBy = oResponse.responseText;
-        let oJSON = JSON.parse(sResponseBy);        
+		
+		<script>
+		
+			function voltar(){
+				// voltar para entrada
+				location.href = "entrada.html";
+			}
+			
+			function carregaResposta(){
+				var oUrl = new URL(location.href);
+				var sValorOrigem = oUrl.searchParams.get("valor_origem");
+				console.log(sValorOrigem);
+			}
+			
+			function callback(){
+				console.log("Caiu aqui");
+				var oResponse = this;
+				var sResponseBody = oResponse.responseText;
+				var oJSON = JSON.parse(sResponseBody);
+				var sReais = oJSON.rates.BRL;
+				console.log(sReais);
+				
+				document.querySelector("#valor_destino").value = sReais;
+			}
+			
+			function chamaAPI(){
+				const sURL = "https://api.exchangeratesapi.io/latest";
+				var oRequest = new XMLHttpRequest();
+				oRequest.addEventListener("load", callback  );
+				
+				// oRequest.addEventListener("load", function(){ 
+				// 	callback(this.responseText);
+				// }  );
+				
+				oRequest.open("GET", sURL);
+				oRequest.send();
+				console.log("depois do send");
+			}
+			
+			window.onload = function (){
+				chamaAPI();
+			}
+			
+			
+		</script>
+		
+	</head>
+	<body>
+		
+        <label>Moeda de destino</label>
+        <input type="text" value="BRL" disabled>
+        <br />
+        <label>Valor de destino</label>
+        <input id="valor_destino" type="number" disabled >
         
-
-        let smoedaDestino = moedaDestino();
-        let sValorOrigem  = valorOrigem();
-
-        let sReais = oJSON.rates[smoedaDestino] > 0 ? oJSON.rates[smoedaDestino] * sValorOrigem
-                                                    : oJSON.rates[smoedaDestino] / sValorOrigem;
-        valorDestion(sReais);
-       
-
-      }
-
-      function chamaAPI() {
-        const sURL = `https://api.exchangeratesapi.io/latest?base=${moedaOrigem().toUpperCase()}`;
-        let oRequest = new XMLHttpRequest();
-        oRequest.addEventListener("load", callBack); //Isso é uma chamada AJAX
-        oRequest.open("GET", sURL); //("GET", sURL, false); não faz assíncrono;
-        oRequest.send();
-        console.log("já passou pelo send");
-      }
-
-      window.onload = function () {
-        chamaAPI();
-      };
-    </script>
-  </body>
+        <br />
+		<button type="button" onclick="voltar()">
+		 Voltar
+		</button>
+         
+	</body>
 </html>
