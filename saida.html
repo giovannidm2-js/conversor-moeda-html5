@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conversor de Moeda - Saída</title>
+  </head>
+  <body>
+    <label>Moeda de Destino</label>
+    <input type="text" id="1" disabled />
+    <br />
+    <label>Valor de Destino</label>
+    <input type="number" id="2" disabled />
+
+    <br />
+    <button type="button" onclick="voltar()">Voltar</button>
+
+    <script>
+      function voltar() {
+        //voltar para tela de entrada
+        location.href = "entrada.html";
+      }
+
+      function valorOrigem() {
+        let oUrl = new URL(location.href);
+        let sValorOrigem = oUrl.searchParams.get("valor_origem");
+        console.log(sValorOrigem);
+        return sValorOrigem;
+      }
+
+      function moedaOrigem() {
+        let oUrl = new URL(location.href);
+        let sMoedaOrigem = oUrl.searchParams.get("moeda_origem");
+
+        console.log(sMoedaOrigem);
+        return sMoedaOrigem;
+      }
+
+      function moedaDestino() {
+        let oUrl = new URL(location.href);
+        let sMoedaDestino = oUrl.searchParams.get("moeda_destino");
+        document.getElementById("1").value = sMoedaDestino.toUpperCase();        
+        return sMoedaDestino.toUpperCase();
+      }
+
+      function valorDestion(sReais){
+        document.getElementById("2").value = sReais;
+      }
+
+      function callBack() {
+        //o Resultado vem no "this"
+        console.log("caiu aqui antes do send");
+        let oResponse = this;
+        let sResponseBy = oResponse.responseText;
+        let oJSON = JSON.parse(sResponseBy);        
+        
+
+        let smoedaDestino = moedaDestino();
+        let sValorOrigem  = valorOrigem();
+
+        let sReais = oJSON.rates[smoedaDestino] > 0 ? oJSON.rates[smoedaDestino] * sValorOrigem
+                                                    : oJSON.rates[smoedaDestino] / sValorOrigem;
+        valorDestion(sReais);
+       
+
+      }
+
+      function chamaAPI() {
+        const sURL = `https://api.exchangeratesapi.io/latest?base=${moedaOrigem().toUpperCase()}`;
+        let oRequest = new XMLHttpRequest();
+        oRequest.addEventListener("load", callBack); //Isso é uma chamada AJAX
+        oRequest.open("GET", sURL); //("GET", sURL, false); não faz assíncrono;
+        oRequest.send();
+        console.log("já passou pelo send");
+      }
+
+      window.onload = function () {
+        chamaAPI();
+      };
+    </script>
+  </body>
+</html>
