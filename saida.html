@@ -12,16 +12,7 @@
 				location.href = "entrada.html";
 			}
 			
-	function getValorOrigem(){
-				var oUrl = new URL(location.href);
-				var sValorOrigem = oUrl.searchParams.get("valor_origem");
-				console.log(sValorOrigem);
-				return sValorOrigem;
-			}
-
-
-
-		function callback(){
+			function callback(){
 				console.log("Caiu aqui");
 				var oResponse = this;
 				var sResponseBody = oResponse.responseText;
@@ -29,9 +20,13 @@
 				var sReais = oJSON.rates.BRL;
 				console.log(sReais);
 				
-				document.querySelector("#valor_destino").value = sReais * getValorOrigem();
+				// AQUI
+				var oUrl = new URL(location.href);
+				var sValorOrigem = oUrl.searchParams.get("valor_origem");
+				console.log(sValorOrigem);
+				
+				document.querySelector("#valor_destino").value = sReais * sValorOrigem;
 			}
-
 			
 			function chamaAPI(){
 				const sURL = "https://api.exchangeratesapi.io/latest";
